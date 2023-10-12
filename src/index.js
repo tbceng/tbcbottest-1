@@ -45,6 +45,23 @@ client.on('messageCreate', (message) => {
     }
 });
 
+
+
+// for slash commands 
+//
+//
+
+client.on('interactionCreate', (interaction) => {
+if (!interaction.isChatInputCommand()) return;
+
+if (interaction.commandName === 'hey'){
+    interaction.reply('hey!');
+}
+});
+
+//console.log(interaction.commandName);
+//});
+
 //login and token for the bot 
 //token is hidden 
 client.login(process.env.TOKEN);
