@@ -75,7 +75,7 @@ client.on('interactionCreate', (interaction) => {
             socketclient.write(args);
         }
     }
-});;
+});
 
 //console.log(interaction.commandName);
 //});
