@@ -1,3 +1,7 @@
+// all code here is setup for / cmmds will be adding comments to how it all works at a later date 
+
+
+
 require('dotenv').config();
 
 

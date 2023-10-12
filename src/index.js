@@ -44,7 +44,7 @@ client.on('messageCreate', (message) => {
         message.reply("balls")
     }
 });
-
+//
 
 
 // for slash commands 
