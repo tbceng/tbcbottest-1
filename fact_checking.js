@@ -15,13 +15,13 @@ const client = new Client({
 
 // checks bot state and retures bot is online 
 client.on('ready', (c) => {
-    console.log(`${c.user.tag} is online`);
+    socketclient.on(`${c.user.tag} is online`);
 
 });
 
 //logs messages 
 client.on('messageCreate', (message)=> {
-    console.log(message.content);
+    socketclient.on(message.content);
 });
 
 // check if a message is pong and respond with ping back 
@@ -48,17 +48,21 @@ client.on('messageCreate', (message) => {
 //
 const socketclient = new net.Socket();
 
+
+
+// fact check testing
 socketclient.connect(5050, '192.168.0.138', () => {
-    console.log("connected from js") // use this as the command /factcheck tennis is an olympic sport
+    socketclient.on("connected from js") // use this as the command /factcheck tennis is an olympic sport
 });
 
 socketclient.on('data', (data) => {
-    console.log(data) // let the bot say this
+    socketclient.on(data) // let the bot say this
 });
 
 
-// for slash commands 
+
 //
+// for slash commands 
 //
 
 client.on('interactionCreate', (interaction) => {

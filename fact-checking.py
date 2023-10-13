@@ -3,10 +3,12 @@ from googlesearch import search
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 
+
 def google(num_results, query):
     search_results = search(query, stop=num_results)
     return search_results
 
+#please comment your code 
 def factcheck(dc_message):
     split_msg = dc_message.lower().split()
     good_scentences = []

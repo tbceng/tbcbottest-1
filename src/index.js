@@ -44,16 +44,18 @@ client.on('messageCreate', (message) => {
         message.reply("balls")
     }
 });
+
+
+
 //
-
-
 // for slash commands 
 //
-//
 
+//setup interction 
 client.on('interactionCreate', (interaction) => {
 if (!interaction.isChatInputCommand()) return;
 
+//if slash command is hey, then respond with hey!
 if (interaction.commandName === 'hey'){
     interaction.reply('hey!');
 }
@@ -63,7 +65,6 @@ if (interaction.commandName === 'hey'){
 //});
 
 //login and token for the bot 
-//token is hidden 
 client.login(process.env.TOKEN);
 
 
