@@ -2,6 +2,8 @@ const net = require('net');
 require('dotenv').config();
 
 const {Client, IntentsBitField, messageLink} = require('discord.js');
+const { channel } = require('diagnostics_channel');
+const factchannel = require('diagnostics_channel');
 
 //setup of guilds 
 const client = new Client({
@@ -15,13 +17,13 @@ const client = new Client({
 
 // checks bot state and retures bot is online 
 client.on('ready', (c) => {
-    socketclient.on(`${c.user.tag} is online`);
+    console.log(`${c.user.tag} is online`);
 
 });
 
 //logs messages 
 client.on('messageCreate', (message)=> {
-    socketclient.on(message.content);
+    console.log(message.content);
 });
 
 // check if a message is pong and respond with ping back 
@@ -48,36 +50,42 @@ client.on('messageCreate', (message) => {
 //
 const socketclient = new net.Socket();
 
-
-
-// fact check testing
 socketclient.connect(5050, '192.168.0.138', () => {
-    socketclient.on("connected from js") // use this as the command /factcheck tennis is an olympic sport
-});
-
-socketclient.on('data', (data) => {
-    socketclient.on(data) // let the bot say this
+    console.log("connected from js") // use this as the command /factcheck tennis is an olympic sport
 });
 
 
-
-//
 // for slash commands 
 //
+//
 
-client.on('interactionCreate', (interaction) => {
+client.on('interactionCreate', async (interaction) => {
     if (!interaction.isCommand()) return;
 
-    if (interaction.commandName === 'hey') {
-        interaction.reply('hey!');
-    } else if (interaction.commandName === 'factcheck') {
+    if (interaction.commandName === 'factcheck') {
         const args = interaction.options.getString('fact');
 
         if (!args) {
             interaction.reply(`You didn't provide any fact to check, ${interaction.user.username}!`);
-        } else {
-            socketclient.write(args);
+            return; // Exit the function if no fact is provided
         }
+
+        // Acknowledge the user's input
+        await interaction.reply(`You asked: ${args} I am researching right now...`);
+
+        // Function to send the result to the same channel
+        const sendResultToChannel = (result) => {
+            interaction.followUp(`Fact check result: ${result}`);
+        };
+
+        // Perform the fact checking and send the result to the same channel
+        socketclient.on('data', (data) => {
+            const result = data.toString(); // Assuming the data is a string
+            sendResultToChannel(result);
+        });
+
+        // Send the user's fact to the socket
+        socketclient.write(args);
     }
 });
 
@@ -86,4 +94,4 @@ client.on('interactionCreate', (interaction) => {
 
 //login and token for the bot 
 //token is hidden 
-client.login(process.env.TOKEN);
+client.login('MTE2MjM4MzAwNTM1NzE5MTE5OA.GEb6wz.rYnWiTGtJ9ZEtJ6uxb6FH3eogwi3VRphSZzqGo');
