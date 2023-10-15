@@ -1,4 +1,6 @@
 # tbcbottest-1
-This is a group project from TBC dedicated towards creating a discord bot that has the ability to fact check statements sent by users.
+This is a group project from TBC.
+  Dedicated towards creating a discord bot.
+    That has the ability to fact check statements sent by users.
 
 
