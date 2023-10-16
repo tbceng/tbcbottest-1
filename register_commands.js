@@ -23,7 +23,7 @@ const commands = [
 ];
 
 // get bot token
-const rest = new REST({ version: '10'}).setToken('MTE2MjM4MzAwNTM1NzE5MTE5OA.GEb6wz.rYnWiTGtJ9ZEtJ6uxb6FH3eogwi3VRphSZzqGo');
+const rest = new REST({ version: '10'}).setToken(process.env.TOKEN);
 
 (async () => {
     try{
@@ -33,7 +33,7 @@ const rest = new REST({ version: '10'}).setToken('MTE2MjM4MzAwNTM1NzE5MTE5OA.GEb
         //more command setup with guilds 
         await rest.put(
             Routes.applicationGuildCommands(
-                '1162383005357191198',
+                '1162427202890104883',
                 '1159342687615455252'
                 ),
             {body: commands }

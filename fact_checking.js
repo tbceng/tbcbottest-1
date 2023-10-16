@@ -50,7 +50,7 @@ client.on('messageCreate', (message) => {
 //
 const socketclient = new net.Socket();
 
-socketclient.connect(5050, '192.168.0.138', () => {
+socketclient.connect(5050, '192.168.31.172', () => {
     console.log("connected from js") // use this as the command /factcheck tennis is an olympic sport
 });
 
@@ -94,4 +94,4 @@ client.on('interactionCreate', async (interaction) => {
 
 //login and token for the bot 
 //token is hidden 
-client.login('MTE2MjM4MzAwNTM1NzE5MTE5OA.GEb6wz.rYnWiTGtJ9ZEtJ6uxb6FH3eogwi3VRphSZzqGo');
+client.login(process.env.TOKEN);

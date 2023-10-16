@@ -4,7 +4,7 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup
 
 def google(num_results, query):
-    search_results = search(query, stop=num_results)
+    search_results = search(query, num_results=num_results)
     return search_results
 
 def factcheck(dc_message):
@@ -66,7 +66,8 @@ def main():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((IP_ADRESS, PORT))
     server.listen(1)
-    
+    print(IP_ADRESS)
+
     print('Python server is listening...')
 
     connection, address = server.accept()
