@@ -31,10 +31,10 @@ bot.on('messageCreate', (message)=> {
 
 bot.on('messageCreate', async message => {
     if (message.content.startsWith('!ask')) {
-        const [command, question, context] = message.content.split(' | ');
-        console.log(command,question,context);
+        const [command, question] = message.content.split(' | ');
+        console.log(command,question);
 
-        axios.post('http://127.0.0.1:5050/ask', {question, context})
+        axios.post('http://127.0.0.1:5050/ask', {question})
         .then(response => {
           console.log(response);
           message.channel.send("um, actually: " + response.data.answer);
