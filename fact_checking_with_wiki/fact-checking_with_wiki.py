@@ -1,11 +1,14 @@
 import socket
 from googlesearch import search
 from urllib.request import urlopen
+import requests
 from bs4 import BeautifulSoup
 import wikipedia as wp
 import time
+from scrapingbee import ScrapingBeeClient 
+import threading
 
-
+scentences = []
 
 def google(num_results, query):
     search_results = search(query, stop=num_results)
@@ -22,38 +25,42 @@ def wiki_summarize(topic):
     else:
         return "Sorry, I didn't find anything :("
 
-def factcheck(dc_message, res, timeout, timeoutStart):
+def check_url(url, cli):
+    global scentences
+    req = cli.get(url)
+    if (req.status_code == 200):
+        html = req.content
+        soup = BeautifulSoup(html, "html.parser")
+        text = soup.get_text().lower()
+        text = text.split(".")
+        for sc in text:
+            scentences.append(sc)
+
+def factcheck(dc_message, res, BEECLIENT):
+    global scentences
     split_msg = dc_message.lower().split()
     good_scentences = []
+    threads = []
     response = ''
     num_results = res
     search_results = google(num_results, dc_message)
-    try:
-        search_results = [url for url in search_results if "#" not in url]
-        for url in search_results:
+    for url in search_results:
+        if not '#' in str(url):
             print(f"reading {url} right now...")
-            try:
-                page = urlopen(url)
-                html = page.read().decode("utf-8")
-                soup = BeautifulSoup(html, "html.parser")
-                text = soup.get_text().lower()
-                text = text.split(".")
-            except:
-                continue
-            print("checking if message is in the site...")
-            for scentence in text:
-                correct = 0
-                for word in split_msg:
-                    if word in scentence:
-                        correct += 1
-                if correct == len(split_msg)-1:
-                    print(f"new good scentence {scentence}")
-                    good_scentences.append(scentence)
-    except Exception as e:
-        print(e)
-        timeout = 60
-        timeoutStart = time.time()
-        response = f'My search has been blocked by google, this feature will probably be available again in 60 seconds. Error: {e}'
+            URLthread = threading.Thread(target=check_url, args=(url, BEECLIENT))
+            URLthread.start()
+            threads.append(URLthread)
+    for URLthread in threads:
+        URLthread.join()
+    print("done with readin urls")
+    for scentence in scentences:
+        correct = 0
+        for word in split_msg:
+            if word in scentence:
+                correct += 1
+        if correct == len(split_msg)-1:
+            print(f"new good scentence {scentence}")
+            good_scentences.append(scentence)
         
     if response == '':
         highest_similarity = 0
@@ -82,12 +89,11 @@ def factcheck(dc_message, res, timeout, timeoutStart):
             return factcheck(dc_message, num_results + 10)
     
     else:
-        return response, timeout, timeoutStart
+        return response
 
 def main():
-    timeout = 0
-    timeoutStart = time.time()
-    
+    global scentences
+    BEECLIENT = ScrapingBeeClient(api_key='BNF5GS7P1J7AZ8A6O6A252T8CN4JA9OZH3UDFZ48PE3AKJK7PW4KU6SM8JZUMF8XI9OJTWL41Y3A4RP2')
     PORT = 8080
     IP_ADRESS = socket.gethostbyname(socket.gethostname())
 
@@ -108,15 +114,12 @@ def main():
         
         
         if 'factcheck' in data:
-            if time.time() > timeoutStart + timeout:
-                data = data[:-9]
-                response, newtimeout, newtimeoutStart = factcheck(data, 20, timeout, timeoutStart)
-                timeout = newtimeout
-                timeoutStart = newtimeoutStart
-                connection.send(response.encode())
-                print("sent it back to js")
-            else:
-                connection.send('this feature is not available right now, please try again in a minute'.encode())
+            scentences.clear()
+            data = data[:-9]
+            print("someone asked: " + data)
+            response = factcheck(data, 10, BEECLIENT)
+            connection.send(response.encode())
+            print("sent it back to js")
         
         if 'get-info' in data:
             data = data[:-8]
