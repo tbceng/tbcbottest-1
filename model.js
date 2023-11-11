@@ -44,5 +44,35 @@ bot.on('messageCreate', async message => {
         });
     }
 });
+bot.on('messageCreate',async message => {
+    if (message.content.startsWith('!check')){
+        const [command, question] = message.content.split('|');
+        console.log(command,question);
+        if (!question) return message.channel.send(` Please include a fact to check.`);
+        const url = `https://factchecktools.googleapis.com/v1alpha1/claims:search?key=${process.env.GOOGLE_API_KEY}&query=${encodeURIComponent(question)}`
+        // await axios.post('https://factchecktools.googleapis.com/v1alpha1/claims:search', {
+        // // headers:{key: process.env.GOOGLE_API_KEY},
+        // params: {
+        //     key: process.env.GOOGLE_API_KEY,
+        //     query: question,
+        //     languageCode: "en-US",
+        // }
+        await axios.get(url).then(res=>{
+        if (res.data.claims) {
+            let claim = res.data.claims[0]
+            let review = res.data.claims[0].claimReview[0]
+            if (review.textualRating === "True") {
+                message.channel.send("fact is true.");  
+            }
+            else{
+                message.channel.send("fact is false");
+            }
+            }
+    })
+    .catch(error => {
+        console.error(error);
+      });   
+    }
 
+})
 bot.login(process.env.TOKEN);
