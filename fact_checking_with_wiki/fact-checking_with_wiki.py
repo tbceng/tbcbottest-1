@@ -1,3 +1,4 @@
+# Do some imports
 import socket
 from googlesearch import search
 from urllib.request import urlopen
@@ -8,12 +9,15 @@ import time
 from scrapingbee import ScrapingBeeClient 
 import threading
 
+# This list will be used later to storeall the scentences found on the websites
 scentences = []
 
+# Function to do the googlesearch
 def google(num_results, query):
     search_results = search(query, stop=num_results)
     return search_results
 
+# Function to do the summarize command, pretty simple to understand
 def wiki_summarize(topic):
     try:
         response = wp.summary(topic, sentences = 2)
@@ -25,40 +29,45 @@ def wiki_summarize(topic):
     else:
         return "Sorry, I didn't find anything :("
 
+# This function will get all the scentences foumd on one website. It will be multithreaded
 def check_url(url, cli):
+    # gloabal scentences to add them into a list that can be easily usen in the main function
     global scentences
+    # get the request from scrapingbee
     req = cli.get(url)
-    if (req.status_code == 200):
+    if (req.status_code == 200): # code 200 means SUCCEED
+        # html to get the html code out of the request and BeatifulSoup to get the wanted text
         html = req.content
         soup = BeautifulSoup(html, "html.parser")
+        # the text will be lowered to make it mpre compatible with the discord message wich will be lowered too to avoid an unsimilarity in the words
         text = soup.get_text().lower()
-        text = text.split(".")
+        text = text.split(".") # splits the text into scentences
         for sc in text:
             scentences.append(sc)
 
 def factcheck(dc_message, res, BEECLIENT):
-    global scentences
-    split_msg = dc_message.lower().split()
+    global scentences  # to get access to the list where the scentences are stored
+    split_msg = dc_message.lower().split() # make the message compatible with the text
     good_scentences = []
     threads = []
     response = ''
     num_results = res
-    search_results = google(num_results, dc_message)
+    search_results = google(num_results, dc_message) # get the first results from a googlesearch
     for url in search_results:
-        if not '#' in str(url):
+        if not '#' in str(url): # this is done so that for example wikipedia/usa#history wont be looked through because it's the same content as wikipedia/usa
             print(f"reading {url} right now...")
             URLthread = threading.Thread(target=check_url, args=(url, BEECLIENT))
-            URLthread.start()
+            URLthread.start() # start the threading...
             threads.append(URLthread)
     for URLthread in threads:
-        URLthread.join()
+        URLthread.join() # join the threads so that the code waits for them to be finished before moving on
     print("done with readin urls")
-    for scentence in scentences:
+    for scentence in scentences: # goes through every scentence to check if it's relevant
         correct = 0
         for word in split_msg:
             if word in scentence:
                 correct += 1
-        if correct == len(split_msg)-1:
+        if correct == len(split_msg)-1: # checks if enough words from the message are used in the scentence
             print(f"new good scentence {scentence}")
             good_scentences.append(scentence)
         
@@ -66,7 +75,7 @@ def factcheck(dc_message, res, BEECLIENT):
         highest_similarity = 0
         highest_similarity_index = None
         print("picking the best scentence...")
-        for i in range(len(good_scentences)):
+        for i in range(len(good_scentences)): # goes through every relevant scentence and checks wich one has the most similarity to the other ones
             similarity = 0
             for j in range(len(good_scentences)):
                 if i != j:
@@ -85,7 +94,7 @@ def factcheck(dc_message, res, BEECLIENT):
             response = good_scentences[highest_similarity_index]
             
             return response
-        except TypeError:
+        except TypeError: # if there were no scentences found it will consult in a TypeError, that means that the google searc will check the next 10 results
             return factcheck(dc_message, num_results + 10)
     
     else:
@@ -97,13 +106,13 @@ def main():
     PORT = 8080
     IP_ADRESS = socket.gethostbyname(socket.gethostname())
 
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind((IP_ADRESS, PORT))
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # set up the socket server
+    server.bind((IP_ADRESS, PORT)) # bind the server
     server.listen(1)
     
     print('Python server is listening...')
 
-    connection, address = server.accept()
+    connection, address = server.accept() # let the server accept the js connection
     
     online = True
     
@@ -112,19 +121,19 @@ def main():
         if not data:
             break
         
-        
+        # if he recives data: (the js code will add factcheck to the message in the factcheck command was done and summarize if the summarizecommand was wanted)
         if 'factcheck' in data:
             scentences.clear()
-            data = data[:-9]
+            data = data[:-9] # remove the factcheck string from the data
             print("someone asked: " + data)
             response = factcheck(data, 10, BEECLIENT)
-            connection.send(response.encode())
+            connection.send(response.encode()) # send the data
             print("sent it back to js")
         
         if 'get-info' in data:
-            data = data[:-8]
+            data = data[:-8] # remove the get-info string from the data
             response = wiki_summarize(data)
-            connection.send(response.encode())
+            connection.send(response.encode())# send the data
 
     connection.close()
     
