@@ -54,10 +54,8 @@ bot.on('messageCreate', async message => {
         console.log("Command:", command);
         console.log("\nQuestion:", question);
         if (!question) return message.channel.send(` Please include a fact to check.`);
-        // const url = `https://factchecktools.googleapis.com/v1alpha1/claims:search?key=${process.env.GOOGLE_API_KEY}&query=${encodeURIComponent(question)}`
         try {
             const res = await axios.get('https://factchecktools.googleapis.com/v1alpha1/claims:search', {
-                // headers:{key: process.env.GOOGLE_API},
                 params: {
                     key: process.env.GOOGLE_API,
                     query: question,
@@ -82,22 +80,7 @@ bot.on('messageCreate', async message => {
             message.channel.send("incorrect input");
         }
 
-        // await axios.get(url)
-        //     .then(res => {
-        //         if (res.data.claims) {
-        //             let claim = res.data.claims[0]
-        //             let review = res.data.claims[0].claimReview[0]
-        //             if (review.textualRating == "True") {
-        //                 message.channel.send("fact is true.");  
-        //             }
-        //             else{
-        //                 message.channel.send("fact is false");
-        //             }
-        //         }
-        //     })
-        //     .catch(error => {
-        //         console.error(error);
-        //     });
+        
     }
 });
 
