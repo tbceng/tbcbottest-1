@@ -10,8 +10,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^1.5.1",
+    "axios": "^1.6.1",
+    "bard-ai": "^2.0.3",
+    "discord-reply": "^0.1.2",
     "discord.js": "^14.13.0",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "enmap": "^5.9.8",
+    "fs": "^0.0.1-security",
+    "googleapis": "^128.0.0"
   }
 }

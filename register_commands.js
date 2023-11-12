@@ -20,6 +20,15 @@ const commands = [
             },
         ],
     },
+    {
+        name: 'facts with bard',
+        description: 'asks bard ai to fact check the info',
+        options: [
+        {type: 3,
+        required: true,
+        },
+    ],
+    },
 ];
 
 // get bot token

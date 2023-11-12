@@ -1,7 +1,7 @@
 const net = require('net');
 require('dotenv').config();
 
-const {Client, IntentsBitField, messageLink} = require('discord.js');
+const {Client, IntentsBitField, messageLink,Discord} = require('discord.js');
 const { channel } = require('diagnostics_channel');
 const factchannel = require('diagnostics_channel');
 const axios  = require("axios");
@@ -44,35 +44,61 @@ bot.on('messageCreate', async message => {
         });
     }
 });
-bot.on('messageCreate',async message => {
-    if (message.content.startsWith('!check')){
-        const [command, question] = message.content.split('|');
-        console.log(command,question);
-        if (!question) return message.channel.send(` Please include a fact to check.`);
-        const url = `https://factchecktools.googleapis.com/v1alpha1/claims:search?key=${process.env.GOOGLE_API_KEY}&query=${encodeURIComponent(question)}`
-        // await axios.post('https://factchecktools.googleapis.com/v1alpha1/claims:search', {
-        // // headers:{key: process.env.GOOGLE_API_KEY},
-        // params: {
-        //     key: process.env.GOOGLE_API_KEY,
-        //     query: question,
-        //     languageCode: "en-US",
-        // }
-        await axios.get(url).then(res=>{
-        if (res.data.claims) {
-            let claim = res.data.claims[0]
-            let review = res.data.claims[0].claimReview[0]
-            if (review.textualRating === "True") {
-                message.channel.send("fact is true.");  
-            }
-            else{
-                message.channel.send("fact is false");
-            }
-            }
-    })
-    .catch(error => {
-        console.error(error);
-      });   
-    }
 
-})
+bot.on('messageCreate', async message => {
+    if (message.content.startsWith('!check')) {
+        const commandPrefix = '!check ';
+        const command = commandPrefix;
+        const question = message.content.slice(commandPrefix.length).trim();
+        console.log(command, question);
+        console.log("Command:", command);
+        console.log("\nQuestion:", question);
+        if (!question) return message.channel.send(` Please include a fact to check.`);
+        // const url = `https://factchecktools.googleapis.com/v1alpha1/claims:search?key=${process.env.GOOGLE_API_KEY}&query=${encodeURIComponent(question)}`
+        try {
+            const res = await axios.get('https://factchecktools.googleapis.com/v1alpha1/claims:search', {
+                // headers:{key: process.env.GOOGLE_API},
+                params: {
+                    key: process.env.GOOGLE_API,
+                    query: question,
+                    languageCode: "en-US",
+                }
+            });
+            if (res.data.claims) {
+                message.suppressEmbeds(true);
+                let claim = res.data.claims[0];
+                let review = res.data.claims[0].claimReview[0];
+                if (review.textualRating === "True") {
+                    message.channel.send(`${review.textualRating} :** ${claim.text}\n\n** Proof: ${review.title ? review.title : ""}\n <${review.url}>`);
+                } else {
+                    message.suppressEmbeds(true) ;
+                    message.channel.send(`**${review.textualRating}: ${claim.text}\n\n Proof: ${review.title ? review.title : ""}\n <${review.url}>`);
+                }
+            } else {
+                message.channel.send(`There was no information regarding that fact. Maybe try being more specific?`);
+            }
+        } catch (error) {
+            console.error('Error making API request', error);
+            message.channel.send("incorrect input");
+        }
+
+        // await axios.get(url)
+        //     .then(res => {
+        //         if (res.data.claims) {
+        //             let claim = res.data.claims[0]
+        //             let review = res.data.claims[0].claimReview[0]
+        //             if (review.textualRating == "True") {
+        //                 message.channel.send("fact is true.");  
+        //             }
+        //             else{
+        //                 message.channel.send("fact is false");
+        //             }
+        //         }
+        //     })
+        //     .catch(error => {
+        //         console.error(error);
+        //     });
+    }
+});
+
 bot.login(process.env.TOKEN);
