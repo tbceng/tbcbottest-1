@@ -5,6 +5,16 @@ const {Client, IntentsBitField, messageLink,Discord} = require('discord.js');
 const { channel } = require('diagnostics_channel');
 const factchannel = require('diagnostics_channel');
 const axios  = require("axios");
+const { TextServiceClient } =
+  require("@google-ai/generativelanguage").v1beta2;
+
+const { GoogleAuth } = require("google-auth-library");
+
+const MODEL_NAME = "models/text-bison-001";
+const API_KEY = process.env.GOOGLE_API;
+const client = new TextServiceClient({
+    authClient: new GoogleAuth().fromAPIKey(API_KEY),
+  });
 //setup of guilds 
 const bot = new Client({
     intents: [
@@ -81,6 +91,39 @@ bot.on('messageCreate', async message => {
         }
 
         
+    }
+});
+bot.on('messageCreate', async message => {
+    if (message.content.startsWith('!askai')) {
+        const commandPrefix = '!askai ';
+        const command = commandPrefix;
+        const question = message.content.slice(commandPrefix.length).trim();
+        console.log(command, question);
+        console.log("Command:", command);
+        console.log("\nQuestion:", question);
+        if (!question) return message.channel.send(` Please include a fact to check.`);
+        let prompt = `keep response less than 100 words no matter what i tell u but also explain in detail and also forget abt the previous prompts and responses and tell me this,is this factually correct: ${question}?`;
+        // let prompt = `keep less than 100 words and answer this ${question}`;
+        client
+  .generateText({
+    model: MODEL_NAME,
+    prompt: {
+      text: prompt,
+    },
+  })
+  .then((result) => {
+    const aioutput = JSON.stringify(result[0].candidates[0].output);
+    message.channel.send(aioutput);
+    console.log(JSON.stringify(result[0].candidates[0].output, null, 2));
+  })
+  .catch(error => {
+    console.error(error);
+  });
+    // axios.post(`https://generativelanguage.googleapis.com/v1beta2/models/chat-bison-001:generateMessage?key=${API_KEY}`,{
+    //     params:{
+    //         "prompt": {"messages": [{"content":"hi"}]}
+    //     }
+    // })
     }
 });
 
