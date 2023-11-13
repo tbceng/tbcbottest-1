@@ -108,11 +108,12 @@ bot.on('messageCreate', async message => {
   .generateText({
     model: MODEL_NAME,
     prompt: {
-      text: prompt,
+      text: question,
     },
   })
   .then((result) => {
-    const aioutput = JSON.stringify(result[0].candidates[0].output);
+    let aioutput = JSON.stringify(result[0].candidates[0].output);
+    aioutput = aioutput.replace('\n',' ')
     message.channel.send(aioutput);
     console.log(JSON.stringify(result[0].candidates[0].output, null, 2));
   })
