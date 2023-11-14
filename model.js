@@ -104,7 +104,7 @@ bot.on('messageCreate', async message => {
     console.log(command, question);
     console.log("Command:", command);
     console.log("\nQuestion:", question);
-    if (!question) return message.channel.send(` Please include a fact to check.`);
+    if (!question) return message.reply(` Please include a fact to check.`);
     let prompt = `keep response less than 100 words no matter what i tell u but also explain in detail and also forget abt the previous prompts and responses and tell me this,is this factually correct: ${question}?`;
     // let prompt = `keep less than 100 words and answer this ${question}`;
     client
@@ -116,8 +116,8 @@ bot.on('messageCreate', async message => {
       })
       .then((result) => {
         let aioutput = JSON.stringify(result[0].candidates[0].output);
-        aioutput = aioutput.replace('\n', ' ')
-        message.channel.send(aioutput);
+        aioutput = aioutput.replace(/\\n/g, ' ')
+        message.reply(aioutput);
         console.log(JSON.stringify(result[0].candidates[0].output, null, 2));
       })
       .catch(error => {
