@@ -21,11 +21,13 @@ const commands = [
         ],
     },
     {
-        name: 'facts with bard',
-        description: 'asks bard ai to fact check the info',
+        name: 'google fact check',
+        description: 'fact check using google api',
         options: [
-        {type: 3,
-        required: true,
+        {
+            name: 'google',
+            type: 3,
+            required: true,
         },
     ],
     },
