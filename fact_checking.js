@@ -87,6 +87,7 @@ client.on('interactionCreate', async (interaction) => {
         // Send the user's fact to the socket
         socketclient.write(args);
     }
+    
 });
 
 //console.log(interaction.commandName);

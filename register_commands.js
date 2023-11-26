@@ -20,6 +20,17 @@ const commands = [
             },
         ],
     },
+    {
+        name: 'google fact check',
+        description: 'fact check using google api',
+        options: [
+        {
+            name: 'google',
+            type: 3,
+            required: true,
+        },
+    ],
+    },
 ];
 
 // get bot token

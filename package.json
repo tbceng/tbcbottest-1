@@ -2,16 +2,33 @@
   "name": "tbc-discord-bot",
   "version": "1.0.0",
   "description": "",
-  "main": "src/index.js",
+  "main": "model.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node model.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^1.5.1",
+    "@google-ai/generativelanguage": "^1.1.0",
+    "@google-cloud/vision": "^4.0.2",
+    "axios": "^1.6.1",
+    "bard-ai": "^2.0.3",
+    "canvas": "^2.11.2",
+    "discord-reply": "^0.1.2",
     "discord.js": "^14.13.0",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "enmap": "^5.9.8",
+    "fs": "^0.0.1-security",
+    "gm": "^1.25.0",
+    "google-auth-library": "^9.2.0",
+    "googleapis": "^128.0.0",
+    "os": "^0.1.2",
+    "sharp": "^0.32.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "pm2": "^5.3.0"
   }
 }
